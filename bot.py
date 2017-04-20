@@ -1,8 +1,8 @@
 #!/usr/bin/env python
 # coding: utf-8
 
-from wxbot import *
-import ConfigParser
+from .wxbot import *
+import configparser
 import json
 
 
@@ -14,12 +14,12 @@ class TulingWXBot(WXBot):
         self.robot_switch = True
 
         try:
-            cf = ConfigParser.ConfigParser()
+            cf = configparser.ConfigParser()
             cf.read('conf.ini')
             self.tuling_key = cf.get('main', 'key')
         except Exception:
             pass
-        print 'tuling_key:', self.tuling_key
+        print('tuling_key:', self.tuling_key)
 
     def tuling_auto_reply(self, uid, msg):
         if self.tuling_key:
@@ -31,36 +31,36 @@ class TulingWXBot(WXBot):
             result = ''
             if respond['code'] == 100000:
                 result = respond['text'].replace('<br>', '  ')
-                result = result.replace(u'\xa0', u' ')
+                result = result.replace('\xa0', ' ')
             elif respond['code'] == 200000:
                 result = respond['url']
             elif respond['code'] == 302000:
                 for k in respond['list']:
-                    result = result + u"【" + k['source'] + u"】 " +\
+                    result = result + "【" + k['source'] + "】 " +\
                         k['article'] + "\t" + k['detailurl'] + "\n"
             else:
                 result = respond['text'].replace('<br>', '  ')
-                result = result.replace(u'\xa0', u' ')
+                result = result.replace('\xa0', ' ')
 
-            print '    ROBOT:', result
+            print('    ROBOT:', result)
             return result
         else:
-            return u"知道啦"
+            return "知道啦"
 
     def auto_switch(self, msg):
         msg_data = msg['content']['data']
-        stop_cmd = [u'退下', u'走开', u'关闭', u'关掉', u'休息', u'滚开']
-        start_cmd = [u'出来', u'启动', u'工作']
+        stop_cmd = ['退下', '走开', '关闭', '关掉', '休息', '滚开']
+        start_cmd = ['出来', '启动', '工作']
         if self.robot_switch:
             for i in stop_cmd:
                 if i == msg_data:
                     self.robot_switch = False
-                    self.send_msg_by_uid(u'[Robot]' + u'机器人已关闭！', msg['to_user_id'])
+                    self.send_msg_by_uid('[Robot]' + '机器人已关闭！', msg['to_user_id'])
         else:
             for i in start_cmd:
                 if i == msg_data:
                     self.robot_switch = True
-                    self.send_msg_by_uid(u'[Robot]' + u'机器人已开启！', msg['to_user_id'])
+                    self.send_msg_by_uid('[Robot]' + '机器人已开启！', msg['to_user_id'])
 
     def handle_msg_all(self, msg):
         if not self.robot_switch and msg['msg_type_id'] != 1:
@@ -92,7 +92,7 @@ class TulingWXBot(WXBot):
                     if msg['content']['type'] == 0:  # text message
                         reply += self.tuling_auto_reply(msg['content']['user']['id'], msg['content']['desc'])
                     else:
-                        reply += u"对不起，只认字，其他杂七杂八的我都不认识，,,Ծ‸Ծ,,"
+                        reply += "对不起，只认字，其他杂七杂八的我都不认识，,,Ծ‸Ծ,,"
                     self.send_msg_by_uid(reply, msg['user']['id'])
 
 
